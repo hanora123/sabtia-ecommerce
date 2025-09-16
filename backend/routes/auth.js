@@ -5,6 +5,11 @@ const db = require('../db');
 
 const router = express.Router();
 
+const JWT_SECRET = process.env.JWT_SECRET || 'your-default-secret';
+if (JWT_SECRET === 'your-default-secret') {
+    console.warn('Warning: JWT_SECRET is not set. Using a default secret for development.');
+}
+
 // User registration (signup)
 router.post('/signup', async (req, res) => {
     const { email, password, fullName, shopName } = req.body;
@@ -31,7 +36,7 @@ router.post('/signup', async (req, res) => {
         const newVendor = vendorRows[0];
 
         // Generate JWT
-        const token = jwt.sign({ userId: newUser.id, vendorId: newVendor.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: newUser.id, vendorId: newVendor.id }, JWT_SECRET, { expiresIn: '1h' });
 
         // Set HttpOnly cookie
         res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 3600000 }); // 1 hour
@@ -43,7 +48,7 @@ router.post('/signup', async (req, res) => {
         if (err.code === '23505') { // Unique violation
             return res.status(400).json({ error: 'User with this email already exists' });
         }
-        res.status(500).send('Server error');
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -71,7 +76,7 @@ router.post('/login', async (req, res) => {
         const vendor = vendorRows[0];
 
         // Generate JWT
-        const token = jwt.sign({ userId: user.id, vendorId: vendor?.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user.id, vendorId: vendor?.id }, JWT_SECRET, { expiresIn: '1h' });
 
         // Set HttpOnly cookie
         res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 3600000 }); // 1 hour
@@ -80,7 +85,7 @@ router.post('/login', async (req, res) => {
 
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server error');
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
