@@ -1,0 +1,151 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Updated color tokens to match Cairo marketplace design with earthy tones */
+:root {
+  --background: #eae5d5; /* light beige for backgrounds */
+  --foreground: #4b4b4b; /* dark gray for text */
+  --card: #ffffff; /* white for card backgrounds */
+  --card-foreground: #4b4b4b; /* dark gray for card text */
+  --popover: rgba(255, 255, 255, 0.9); /* soft white for popovers */
+  --popover-foreground: #4b4b4b; /* dark gray for popover text */
+  --primary: #c2b280; /* earthy beige for primary elements */
+  --primary-foreground: #4b4b4b; /* dark gray for primary text */
+  --secondary: #5cba4a; /* accent green for secondary elements */
+  --secondary-foreground: #ffffff; /* white for secondary text */
+  --muted: #f0f0f0; /* light gray for muted content */
+  --muted-foreground: #4b4b4b; /* dark gray for muted text */
+  --accent: #5cba4a; /* accent green for highlights */
+  --accent-foreground: #ffffff; /* white for accent text */
+  --destructive: #ff4d4d; /* red for destructive actions */
+  --destructive-foreground: #ffffff; /* white for destructive text */
+  --border: #d1d5db; /* light gray for borders */
+  --input: #ffffff; /* white for input fields */
+  --ring: rgba(92, 186, 74, 0.5); /* soft green for focus rings */
+  --chart-1: #c2b280; /* earthy beige for charts */
+  --chart-2: #5cba4a; /* accent green for charts */
+  --chart-3: #4b4b4b; /* dark gray for charts */
+  --chart-4: #eae5d5; /* light beige for charts */
+  --chart-5: #f0f0f0; /* light gray for charts */
+  --radius: 0.5rem; /* rounded corners for cards and buttons */
+  --sidebar: #ffffff; /* white for sidebar */
+  --sidebar-foreground: #4b4b4b; /* dark gray for sidebar text */
+  --sidebar-primary: #c2b280; /* earthy beige for primary sidebar elements */
+  --sidebar-primary-foreground: #4b4b4b; /* dark gray for primary sidebar text */
+  --sidebar-accent: #5cba4a; /* accent green for sidebar highlights */
+  --sidebar-accent-foreground: #ffffff; /* white for sidebar accent text */
+  --sidebar-border: #d1d5db; /* light gray for sidebar borders */
+  --sidebar-ring: rgba(92, 186, 74, 0.5); /* soft green for sidebar focus rings */
+}
+
+.dark {
+  --background: #2d2d2d;
+  --foreground: #eae5d5;
+  --card: #3a3a3a;
+  --card-foreground: #eae5d5;
+  --popover: #3a3a3a;
+  --popover-foreground: #eae5d5;
+  --primary: #c2b280;
+  --primary-foreground: #2d2d2d;
+  --secondary: #5cba4a;
+  --secondary-foreground: #ffffff;
+  --muted: #4b4b4b;
+  --muted-foreground: #a0a0a0;
+  --accent: #5cba4a;
+  --accent-foreground: #ffffff;
+  --destructive: #ff4d4d;
+  --destructive-foreground: #ffffff;
+  --border: #4b4b4b;
+  --input: #3a3a3a;
+  --ring: rgba(92, 186, 74, 0.5);
+  --chart-1: #c2b280;
+  --chart-2: #5cba4a;
+  --chart-3: #eae5d5;
+  --chart-4: #4b4b4b;
+  --chart-5: #a0a0a0;
+  --sidebar: #3a3a3a;
+  --sidebar-foreground: #eae5d5;
+  --sidebar-primary: #c2b280;
+  --sidebar-primary-foreground: #2d2d2d;
+  --sidebar-accent: #5cba4a;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #4b4b4b;
+  --sidebar-ring: rgba(92, 186, 74, 0.5);
+}
+
+/* Added Arabic font support and RTL configuration */
+@theme inline {
+  --font-sans: var(--font-cairo), var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Added RTL support for Arabic text */
+  [dir="rtl"] {
+    direction: rtl;
+  }
+
+  [dir="ltr"] {
+    direction: ltr;
+  }
+}
+
+/* Added custom styles for marketplace components */
+@layer components {
+  .marketplace-card {
+    @apply bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow;
+  }
+
+  .marketplace-button {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors;
+  }
+
+  .marketplace-button-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 px-6 py-3 rounded-lg font-medium transition-colors;
+  }
+}

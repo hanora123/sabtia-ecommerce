@@ -1,0 +1,70 @@
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+
+interface UseIntersectionObserverOptions extends IntersectionObserverInit {
+  freezeOnceVisible?: boolean
+}
+
+export function useIntersectionObserver(options: UseIntersectionObserverOptions = {}) {
+  const { threshold = 0, root = null, rootMargin = "0%", freezeOnceVisible = false } = options
+
+  const elementRef = useRef<Element | null>(null)
+  const [entry, setEntry] = useState<IntersectionObserverEntry>()
+
+  const frozen = entry?.isIntersecting && freezeOnceVisible
+
+  const updateEntry = ([entry]: IntersectionObserverEntry[]): void => {
+    setEntry(entry)
+  }
+
+  useEffect(() => {
+    const node = elementRef?.current
+    const hasIOSupport = !!window.IntersectionObserver
+
+    if (!hasIOSupport || frozen || !node) return
+
+    const observerParams = { threshold, root, rootMargin }
+    const observer = new IntersectionObserver(updateEntry, observerParams)
+
+    observer.observe(node)
+
+    return () => observer.disconnect()
+  }, [elementRef, threshold, root, rootMargin, frozen])
+
+  return {
+    ref: elementRef,
+    entry,
+    isIntersecting: !!entry?.isIntersecting,
+    isVisible: !!entry?.isIntersecting,
+  }
+}
+
+// Hook for lazy loading images
+export function useLazyImage(src: string, placeholder?: string) {
+  const { ref, isVisible } = useIntersectionObserver({
+    threshold: 0.1,
+    freezeOnceVisible: true,
+  })
+
+  const [imageSrc, setImageSrc] = useState(placeholder || "")
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    if (isVisible && src) {
+      const img = new Image()
+      img.onload = () => {
+        setImageSrc(src)
+        setIsLoaded(true)
+      }
+      img.src = src
+    }
+  }, [isVisible, src])
+
+  return {
+    ref,
+    src: imageSrc,
+    isLoaded,
+    isVisible,
+  }
+}
