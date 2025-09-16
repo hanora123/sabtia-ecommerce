@@ -10,6 +10,7 @@ import Footer from "@/components/footer"
 import ChatSupport from "@/components/chat-support"
 import { Providers } from "./providers"
 import { Toaster } from "@/components/ui/sonner"
+import { AuthProvider } from "@/hooks/use-auth"; // New import
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -31,13 +32,15 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl">
       <body className={`font-sans ${cairo.variable} ${GeistSans.variable} ${GeistMono.variable}`}>
-        <Providers>
-          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-          <Footer />
-          <ChatSupport />
-          <Analytics />
-          <Toaster />
-        </Providers>
+        <AuthProvider> {/* New wrapper */}
+          <Providers>
+            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+            <Footer />
+            <ChatSupport />
+            <Analytics />
+            <Toaster />
+          </Providers>
+        </AuthProvider> {/* New wrapper */}
       </body>
     </html>
   )

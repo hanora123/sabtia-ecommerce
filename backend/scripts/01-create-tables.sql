@@ -43,28 +43,35 @@ CREATE TABLE IF NOT EXISTS categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Products table
+-- Products table (Base Product Catalog)
 CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    vendor_id UUID REFERENCES vendors(id) ON DELETE CASCADE,
     category_id UUID REFERENCES categories(id),
     name_ar VARCHAR(255) NOT NULL,
     name_en VARCHAR(255) NOT NULL,
     description_ar TEXT,
     description_en TEXT,
+    images TEXT[], -- Array of image URLs
+    specifications JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Product Listings table (Vendor-specific product offerings)
+CREATE TABLE IF NOT EXISTS product_listings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID REFERENCES products(id) ON DELETE CASCADE,
+    vendor_id UUID REFERENCES vendors(id) ON DELETE CASCADE,
+    sku VARCHAR(255),
     price DECIMAL(10,2) NOT NULL,
     original_price DECIMAL(10,2),
     stock_quantity INTEGER DEFAULT 0,
     min_stock_alert INTEGER DEFAULT 5,
-    images TEXT[], -- Array of image URLs
-    specifications JSONB,
     is_active BOOLEAN DEFAULT true,
     is_featured BOOLEAN DEFAULT false,
-    rating DECIMAL(3,2) DEFAULT 0.00,
-    total_reviews INTEGER DEFAULT 0,
-    total_sales INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(product_id, vendor_id) -- Each vendor can only have one listing per product
 );
 
 -- Orders table
@@ -89,8 +96,7 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS order_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
-    product_id UUID REFERENCES products(id),
-    vendor_id UUID REFERENCES vendors(id),
+    product_listing_id UUID REFERENCES product_listings(id),
     quantity INTEGER NOT NULL,
     unit_price DECIMAL(10,2) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
@@ -101,8 +107,8 @@ CREATE TABLE IF NOT EXISTS order_items (
 CREATE TABLE IF NOT EXISTS reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id),
-    product_id UUID REFERENCES products(id),
-    vendor_id UUID REFERENCES vendors(id),
+    product_id UUID REFERENCES products(id), -- Review is for the base product
+    vendor_id UUID REFERENCES vendors(id), -- Can also be linked to a specific vendor
     order_id UUID REFERENCES orders(id),
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),
     comment TEXT,
@@ -114,7 +120,7 @@ CREATE TABLE IF NOT EXISTS reviews (
 CREATE TABLE IF NOT EXISTS wishlist (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id),
-    product_id UUID REFERENCES products(id),
+    product_id UUID REFERENCES products(id), -- Wishlist is for the base product
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, product_id)
 );
@@ -133,9 +139,11 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_products_vendor_id ON products(vendor_id);
+DROP INDEX IF EXISTS idx_products_vendor_id;
+DROP INDEX IF EXISTS idx_products_is_active;
 CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
-CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);
+CREATE INDEX IF NOT EXISTS idx_product_listings_vendor_id ON product_listings(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_product_listings_product_id ON product_listings(product_id);
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON reviews(product_id);
