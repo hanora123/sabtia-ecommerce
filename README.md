@@ -42,7 +42,7 @@ To get the project up and running, you'll need to install the dependencies for b
 1.  **Clone the repository:**
 
     ```bash
-    git clone <repository-url>
+    git clone <[repository-url](https://github.com/hanora123/sabtia-ecommerce)>
     cd sabtiah-project
     ```
 
